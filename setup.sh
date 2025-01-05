@@ -34,7 +34,7 @@ sudo systemctl start docker
 
 # 3. Download Docker Compose file
 COMPOSE_FILE_URL="https://raw.githubusercontent.com/aarato/monitor/main/docker-compose.yaml"
-COMPOSE_FILE_PATH="./docker-compose.yml"
+COMPOSE_FILE_PATH="./docker-compose.yaml"
 
 echo "Downloading Docker Compose file..."
 sudo curl -L $COMPOSE_FILE_URL -o $COMPOSE_FILE_PATH
