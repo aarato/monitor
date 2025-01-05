@@ -32,22 +32,15 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# 3. Install Docker Compose if not included
-if ! docker compose version &> /dev/null; then
-    echo "Installing Docker Compose..."
-    sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-fi
-
-# 4. Download Docker Compose file
-COMPOSE_FILE_URL="https://raw.githubusercontent.com/your-repo/docker-compose.yml"
-COMPOSE_FILE_PATH="/path/to/docker-compose.yml"
+# 3. Download Docker Compose file
+COMPOSE_FILE_URL="https://raw.githubusercontent.com/aarato/monitor/main/docker-compose.yaml"
+COMPOSE_FILE_PATH="./docker-compose.yml"
 
 echo "Downloading Docker Compose file..."
 sudo curl -L $COMPOSE_FILE_URL -o $COMPOSE_FILE_PATH
 
 # 5. Run Docker Compose
 echo "Running Docker Compose..."
-sudo docker-compose -f $COMPOSE_FILE_PATH up -d
+sudo docker compose -f $COMPOSE_FILE_PATH up -d
 
 echo "Docker Compose services are up and running."
