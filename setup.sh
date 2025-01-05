@@ -1,5 +1,7 @@
 #!/bin/bash
 
+REPO="https://raw.githubusercontent.com/aarato/monitor/main/"
+
 # Exit immediately if a command exits with a non-zero status
 set -e
 
