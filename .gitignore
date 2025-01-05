@@ -1,3 +1,9 @@
+#Temporary Blocks
+/monitor*
+.vscode*
+/cloud_setup/*.sh
+/cloud_setup/*
+
 # Logs
 logs
 *.log
