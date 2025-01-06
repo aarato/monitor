@@ -1,9 +1,52 @@
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx-server
+  traefik:
+    container_name: traefik
+    image: "traefik:v2.6"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
-      - "8080:80"
+      - "80:80"
+      - "8080:8080"
     volumes:
-      - ./html:/usr/share/nginx/html
-    restart: always
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  monitor_backend:
+    container_name: monitor_backend
+    image: "aarato/monitor_backend:latest"
+    environment:
+      - PORT=80
+      - PASSWORD=Test123
+    # volumes:
+    #   - ./config.yaml:/app/config.yaml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.monitor_backend.rule=(HostRegexp(`{any:.+}`)  && PathPrefix(`/socket.io`))"
+      - "traefik.http.routers.monitor_frontend.priority=30"
+      - "traefik.http.routers.monitor_backend.entrypoints=web"
+    depends_on:
+      - traefik
+  monitor_frontend:
+    container_name: monitor_frontend
+    image: "aarato/monitor_frontend:latest"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Path(`/index.html`) || Path(`/favicon.ico`) || PathPrefix(`/assets`)"
+      - "traefik.http.routers.monitor_frontend.priority=20"
+      - "traefik.http.routers.monitor_frontend.entrypoints=web"
+  monitor_client_http:
+    container_name: monitor_client_http
+    image: "ucipass/monitor_client_http:latest"
+    environment:
+      - URL=http://monitor_backend
+      - CLIENTNAME=HTTP
+      - PASSWORD=Test123
+    depends_on:
+      - monitor_backend      
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=HostRegexp(`{any:.+}`)"
+      - "traefik.http.routers.monitor_client_http.entrypoints=web"
+      - "traefik.http.routers.monitor_client_http.priority=10"

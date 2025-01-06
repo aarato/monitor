@@ -3,6 +3,7 @@
 .vscode*
 /cloud_setup/*.sh
 /cloud_setup/*
+/source*
 
 # Logs
 logs
