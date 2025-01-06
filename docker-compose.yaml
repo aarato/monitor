@@ -44,7 +44,7 @@ services:
       - CLIENTNAME=HTTP
       - PASSWORD=Test123
     depends_on:
-      - monitor_backend      
+      - monitor_backend
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=HostRegexp(`{any:.+}`)"
