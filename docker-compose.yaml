@@ -19,8 +19,6 @@ services:
     environment:
       - PORT=80
       - PASSWORD=Test123
-    # volumes:
-    #   - ./config.yaml:/app/config.yaml
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.monitor_backend.rule=(HostRegexp(`{any:.+}`)  && PathPrefix(`/socket.io`))"
