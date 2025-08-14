@@ -1,5 +1,52 @@
 # Monitor
-Web based application for real-time monitoring
+Real-time network monitoring web application that displays live ICMP and HTTP(S) traffic with source IP geolocation for diagnostic purposes.
+
+## How It Works
+
+This application creates a web-based dashboard that shows incoming network traffic in real-time. It consists of three main components:
+
+### Use Cases
+- **Network Diagnostics**: See who is pinging your servers and from where
+- **Security Monitoring**: Track unusual traffic patterns or sources
+- **Performance Analysis**: Monitor HTTP response times and availability
+- **Geographic Analysis**: Understand the geographic distribution of your traffic
+
+
+### Data Flow - ICMP Monitoring
+
+```
+Internet                Monitored Server                    Monitor Backend Server                Web GUI
+────────                ────────────────                    ──────────────────────                ───────
+
+┌─────────┐             ┌─────────────────┐                 ┌─────────────────────┐               ┌─────────┐
+│  ICMP   │───────────▶ │                 │                 │                     │               │         │
+│ Packet  │             │  Linux Kernel   │                 │   Syslog Server     │               │   Web   │
+│ (ping)  │             │                 │                 │   (port 5514)       │               │ Browser │
+└─────────┘             │  ┌───────────┐  │                 │                     │               │ Client  │
+                        │  │ iptables  │  │                 │  ┌───────────────┐  │               │ ┌─────┐ │
+                        │  │   RULE    │  │ syslog UDP─────▶│  │ Simple Syslog │  │  WebSocket    │ │Live │ │
+                        │  │           │  │ port 5514       │  │    Server     │  │ (Socket.IO)──▶│ │Chart│ │
+                        │  │LOG PREFIX │  │                 │  │               │  │               │ │     │ │
+                        │  │"IPT_ICMP" │  │                 │  └───────┬───────┘  │               │ └─────┘ │
+                        │  └───────────┘  │                 │          │          │               │         │
+                        │                 │                 │          ▼          │               │ ┌─────┐ │
+                        │  ┌───────────┐  │                 │  ┌───────────────┐  │               │ │ IP  │ │
+                        │  │  rsyslog  │  │                 │  │ WebSocket     │  │               │ │Geo  │ │
+                        │  │  daemon   │  │                 │  │ Broadcaster   │  │               │ │Info │ │
+                        │  │           │  │                 │  │ + GeoIP       │  │               │ │     │ │
+                        │  └───────────┘  │                 │  │ Lookup        │  │               │ └─────┘ │
+                        └─────────────────┘                 │  └───────────────┘  │               └─────────┘
+                                                            └─────────────────────┘
+
+Flow Steps:
+1. ICMP packet arrives from Internet
+2. Linux kernel iptables rule matches and generates log entry with "IPT_ICMP" prefix  
+3. rsyslog daemon forwards log to syslog server component on UDP port 5514
+4. Syslog server component receives log and uses WebSocket (Socket.IO) to send to server
+5. Server component performs GeoIP lookup and broadcasts to connected web GUI clients
+6. Web GUI displays real-time ICMP activity with source IP geolocation
+```
+
 
 # Setup
 The setup script will work on Ubuntu 22.04 linux computers.
