@@ -18,38 +18,35 @@ This application creates a web-based dashboard that shows incoming network traff
 Client 1 (Ping Source)              Client 2 (Web Monitor)
 ──────────────────────             ───────────────────────
 
-┌─────────┐                            ┌─────────────┐
-│  ping   │                            │     Web     │◀─────┐
-│ command │                            │   Browser   │      │
-│  client │                            │ ┌────────┐  │      │
-│         │                            │ │Live    │  │      │
-│         │                            │ │Chart   │  │      │
-└────┬────┘                            │ │Geo-Loc.│  │      │
-     │                                 │ └────────┘  │      │
-     │ ICMP ping                       └─────────────┘      │
-     │                                                      │
-     │                                          WebSocket   │ 
-     │                                         (Socket.IO)  │ 
-     ▼                                                      │
-┌─────────────────┐                 ┌─────────────────────┐ │
-│                 │                 │                     │ │
-│  Linux Kernel   │                 │   Monitor Backend   │ │
-│                 │                 │      Server         │ │
-│  ┌───────────┐  │                 │                     │ │  
-│  │ iptables  │  │                 │  ┌───────────────┐  │ │
-│  │   RULE    │  │                 │  │ WebSocket     │  │ │
-│  │           │  │                 │  │ Broadcaster   │  │ │
-│  │LOG PREFIX │  │                 │  │ + GeoIP       │────┘        
+    ┌─────────┐                        ┌─────────────┐
+    │  ping   │                        │     Web     │
+    │ client  │                        │   Browser   │
+    │         │                        │ ┌────────┐  │     
+    │         │                        │ │Live    │  │     
+    │         │                        │ │Chart   │  │     
+    └────┬────┘                        │ │Geo-Loc.│  │     
+         │                             │ └────────┘  │     
+         │                             │      ▲      │
+         │                             └───── │ ─────┘     
+         │  ICMP ping                         │  WebSocket 
+         │                                    │ (Socket.IO)
+         │                                    │            
+┌─────── │ ───────┐                 ┌──────── │ ──────────┐
+│        ▼        │                 │         │           │
+│  ┌───────────┐  │                 │  ┌───────────────┐  │ 
+│  │ iptables  │  │                 │  │ WebSocket     │  │ 
+│  │   RULE    │  │                 │  │ Broadcaster   │  │ 
+│  │LOG PREFIX │  │                 │  │ + GeoIP       │  │
 │  │"IPT_ICMP" │  │                 │  └───────────────┘  │
 │  └───────────┘  │                 │          ▲          │
-│                 │                 │          │          │
-│  ┌───────────┐  │ syslog UDP      │  ┌───────────────┐  │
-│  │  rsyslog  │  │ port 5514       │  │ NodeJS Syslog │  │
-│  │  daemon   │  │────────────────▶│  │    Server     │  │
-│  │           │  │                 │  │ (port 5514)   │  │
-│  └───────────┘  │                 │  │               │  │
-└─────────────────┘                 │  └───────────────┘  │
-  Monitored Server                  └─────────────────────┘
+│        │        │                 │          │          │
+│        ▼        │   syslog UDP    │  ┌───────────────┐  │
+│  ┌───────────┐  │    port 5514    │  │ NodeJS Syslog │  │
+│  │  rsyslog  │  │────────────────▶│  │    Server     │  │
+│  │  daemon   │  │                 │  │ (port 5514)   │  │
+│  └───────────┘  │                 │  └───────────────┘  │ 
+│  Linux Kernel   │                 │     Application     │
+└─────────────────┘                 └─────────────────────┘                 
 
 Flow Steps:
 1. Client 1 sends ICMP ping to monitored server
