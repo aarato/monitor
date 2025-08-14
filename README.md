@@ -15,36 +15,49 @@ This application creates a web-based dashboard that shows incoming network traff
 ### Data Flow - ICMP Monitoring
 
 ```
-Internet                Monitored Server                    Monitor Backend Server                Web GUI
-────────                ────────────────                    ──────────────────────                ───────
+Client 1 (Ping Source)              Client 2 (Web Monitor)
+──────────────────────             ───────────────────────
 
-┌─────────┐             ┌─────────────────┐                 ┌─────────────────────┐               ┌─────────┐
-│  ICMP   │───────────▶ │                 │                 │                     │               │         │
-│ Packet  │             │  Linux Kernel   │                 │   Syslog Server     │               │   Web   │
-│ (ping)  │             │                 │                 │   (port 5514)       │               │ Browser │
-└─────────┘             │  ┌───────────┐  │                 │                     │               │ Client  │
-                        │  │ iptables  │  │                 │  ┌───────────────┐  │               │ ┌─────┐ │
-                        │  │   RULE    │  │ syslog UDP─────▶│  │ Simple Syslog │  │  WebSocket    │ │Live │ │
-                        │  │           │  │ port 5514       │  │    Server     │  │ (Socket.IO)──▶│ │Chart│ │
-                        │  │LOG PREFIX │  │                 │  │               │  │               │ │     │ │
-                        │  │"IPT_ICMP" │  │                 │  └───────┬───────┘  │               │ └─────┘ │
-                        │  └───────────┘  │                 │          │          │               │         │
-                        │                 │                 │          ▼          │               │ ┌─────┐ │
-                        │  ┌───────────┐  │                 │  ┌───────────────┐  │               │ │ IP  │ │
-                        │  │  rsyslog  │  │                 │  │ WebSocket     │  │               │ │Geo  │ │
-                        │  │  daemon   │  │                 │  │ Broadcaster   │  │               │ │Info │ │
-                        │  │           │  │                 │  │ + GeoIP       │  │               │ │     │ │
-                        │  └───────────┘  │                 │  │ Lookup        │  │               │ └─────┘ │
-                        └─────────────────┘                 │  └───────────────┘  │               └─────────┘
-                                                            └─────────────────────┘
+┌─────────┐                            ┌─────────────┐
+│  ping   │                            │     Web     │◀─────┐
+│ command │                            │   Browser   │      │
+│  client │                            │ ┌────────┐  │      │
+│         │                            │ │Live    │  │      │
+│         │                            │ │Chart   │  │      │
+└────┬────┘                            │ │Geo-Loc.│  │      │
+     │                                 │ └────────┘  │      │
+     │ ICMP ping                       └─────────────┘      │
+     │                                                      │
+     │                                          WebSocket   │ 
+     │                                         (Socket.IO)  │ 
+     ▼                                                      │
+┌─────────────────┐                 ┌─────────────────────┐ │
+│                 │                 │                     │ │
+│  Linux Kernel   │                 │   Monitor Backend   │ │
+│                 │                 │      Server         │ │
+│  ┌───────────┐  │                 │                     │ │  
+│  │ iptables  │  │                 │  ┌───────────────┐  │ │
+│  │   RULE    │  │                 │  │ WebSocket     │  │ │
+│  │           │  │                 │  │ Broadcaster   │  │ │
+│  │LOG PREFIX │  │                 │  │ + GeoIP       │────┘        
+│  │"IPT_ICMP" │  │                 │  └───────────────┘  │
+│  └───────────┘  │                 │          ▲          │
+│                 │                 │          │          │
+│  ┌───────────┐  │ syslog UDP      │  ┌───────────────┐  │
+│  │  rsyslog  │  │ port 5514       │  │ NodeJS Syslog │  │
+│  │  daemon   │  │────────────────▶│  │    Server     │  │
+│  │           │  │                 │  │ (port 5514)   │  │
+│  └───────────┘  │                 │  │               │  │
+└─────────────────┘                 │  └───────────────┘  │
+  Monitored Server                  └─────────────────────┘
 
 Flow Steps:
-1. ICMP packet arrives from Internet
+1. Client 1 sends ICMP ping to monitored server
 2. Linux kernel iptables rule matches and generates log entry with "IPT_ICMP" prefix  
 3. rsyslog daemon forwards log to syslog server component on UDP port 5514
 4. Syslog server component receives log and uses WebSocket (Socket.IO) to send to server
 5. Server component performs GeoIP lookup and broadcasts to connected web GUI clients
-6. Web GUI displays real-time ICMP activity with source IP geolocation
+6. Client 2 web browser displays real-time ICMP activity with source IP geolocation from Client 1
 ```
 
 

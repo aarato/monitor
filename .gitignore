@@ -5,6 +5,9 @@
 /cloud_setup/*
 /source*
 
+# Development files
+CLAUDE.md
+
 # Logs
 logs
 *.log
