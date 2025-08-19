@@ -3,6 +3,9 @@
 /source/clients/old/
 /very_old/
 
+# Allow eBPF folder in clients
+!/source/clients/ebpf/
+
 # Build artifacts and development files
 bundle-stats.html
 dist/

@@ -1,0 +1,97 @@
+# Clean eBPF Makefile without header conflicts
+
+CC = gcc
+CLANG = clang
+LLVM_STRIP = $(shell which llvm-strip-14 2>/dev/null || which llvm-strip 2>/dev/null || echo "true")
+
+# Compiler flags
+CFLAGS = -g -O2 -Wall -Wextra
+BPF_CFLAGS = -g -O2 -target bpf -D__TARGET_ARCH_x86_64
+
+# libbpf flags
+LIBBPF_CFLAGS := $(shell pkg-config --cflags libbpf 2>/dev/null || echo "-I/usr/include")
+LIBBPF_LIBS := $(shell pkg-config --libs libbpf 2>/dev/null || echo "-lbpf -lelf -lz")
+
+.PHONY: all clean
+
+all: monitor_ebpf monitor_ebpf_loader monitor_ebpf_reader
+
+# Compile eBPF kernel program
+monitor_ebpf.bpf.o: monitor_ebpf.bpf.c vmlinux_complete.h
+	$(CLANG) $(BPF_CFLAGS) -c $< -o $@
+	$(LLVM_STRIP) -g $@
+
+# Compile userspace program
+monitor_ebpf.o: monitor_ebpf.c
+	$(CC) $(CFLAGS) $(LIBBPF_CFLAGS) -c $< -o $@
+
+# Link final executable
+monitor_ebpf: monitor_ebpf.o monitor_ebpf.bpf.o
+	$(CC) $(CFLAGS) -o $@ monitor_ebpf.o $(LIBBPF_LIBS)
+
+# Compile loader program
+monitor_ebpf_loader.o: monitor_ebpf_loader.c
+	$(CC) $(CFLAGS) $(LIBBPF_CFLAGS) -c $< -o $@
+
+# Link loader executable
+monitor_ebpf_loader: monitor_ebpf_loader.o monitor_ebpf.bpf.o
+	$(CC) $(CFLAGS) -o $@ monitor_ebpf_loader.o $(LIBBPF_LIBS)
+
+# Compile reader program
+monitor_ebpf_reader.o: monitor_ebpf_reader.c
+	$(CC) $(CFLAGS) $(LIBBPF_CFLAGS) -c $< -o $@
+
+# Link reader executable
+monitor_ebpf_reader: monitor_ebpf_reader.o
+	$(CC) $(CFLAGS) -o $@ monitor_ebpf_reader.o $(LIBBPF_LIBS)
+
+# Test build
+test:
+	@echo "Testing eBPF compilation..."
+	@if make clean && make monitor_ebpf; then \
+		echo "✅ eBPF build successful!"; \
+		ls -la monitor_ebpf*; \
+	else \
+		echo "❌ eBPF build failed"; \
+		exit 1; \
+	fi
+
+# Clean
+clean:
+	rm -f *.o monitor_ebpf monitor_ebpf_loader monitor_ebpf_reader
+
+# Install dependencies for C programs
+deps-c:
+	@echo "Install these packages manually:"
+	@echo "sudo apt update"
+	@echo "sudo apt install clang llvm libbpf-dev linux-headers-\$$(uname -r)"
+
+# Install dependencies for Python programs  
+deps-python:
+	@echo "Installing Python dependencies..."
+	pip install -r requirements.txt
+	@echo "Install BCC system packages:"
+	@echo "sudo apt update"
+	@echo "sudo apt install python3-bpfcc bpfcc-tools"
+
+# Install all dependencies
+deps: deps-c deps-python
+
+# Python programs (no compilation needed)
+python-loader: monitor_ebpf_loader.py
+	@echo "✅ Python loader ready: python monitor_ebpf_loader.py"
+	
+python-reader: monitor_ebpf_reader.py  
+	@echo "✅ Python reader ready: python monitor_ebpf_reader.py"
+
+python: python-loader python-reader
+
+# Hybrid approach (C + Python)
+hybrid: monitor_ebpf_loader monitor_ebpf_reader monitor_socketio_forwarder.py
+	@echo "✅ Hybrid C+Python approach ready:"
+	@echo "   1. sudo ./monitor_ebpf_loader <interface>  (as root)"
+	@echo "   2. python monitor_socketio_forwarder.py    (as user)"
+
+# Make Python forwarder executable
+monitor_socketio_forwarder.py:
+	chmod +x monitor_socketio_forwarder.py
