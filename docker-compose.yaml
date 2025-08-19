@@ -1,9 +1,9 @@
 services:
   traefik:
     container_name: traefik
-    image: "traefik:v2.6"
+    image: "traefik:v2.10"
     command:
-      - "--log.level=DEBUG"
+      - "--log.level=INFO"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -21,8 +21,8 @@ services:
       - PASSWORD=Test123
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.monitor_backend.rule=(HostRegexp(`{any:.+}`)  && PathPrefix(`/socket.io`))"
-      - "traefik.http.routers.monitor_frontend.priority=30"
+      - "traefik.http.routers.monitor_backend.rule=PathPrefix(`/socket.io`)"
+      - "traefik.http.routers.monitor_backend.priority=30"
       - "traefik.http.routers.monitor_backend.entrypoints=web"
     depends_on:
       - traefik
@@ -31,20 +31,6 @@ services:
     image: "aarato/monitor_frontend:latest"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Path(`/index.html`) || Path(`/favicon.ico`) || PathPrefix(`/assets`)"
-      - "traefik.http.routers.monitor_frontend.priority=20"
+      - "traefik.http.routers.monitor_frontend.rule=Path(`/`) || Path(`/index.html`) || Path(`/favicon.ico`) || PathPrefix(`/assets`)"
+      - "traefik.http.routers.monitor_frontend.priority=25"
       - "traefik.http.routers.monitor_frontend.entrypoints=web"
-  monitor_client_http:
-    container_name: monitor_client_http
-    image: "ucipass/monitor_client_http:latest"
-    environment:
-      - URL=http://monitor_backend
-      - CLIENTNAME=HTTP
-      - PASSWORD=Test123
-    depends_on:
-      - monitor_backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=HostRegexp(`{any:.+}`)"
-      - "traefik.http.routers.monitor_client_http.entrypoints=web"
-      - "traefik.http.routers.monitor_client_http.priority=10"

@@ -1,0 +1,6 @@
+# Local development overrides
+services:
+  traefik:
+    ports:
+      - "9080:80"    # Override port 80 -> 9080 for development
+      - "9081:8080"  # Override Traefik dashboard port

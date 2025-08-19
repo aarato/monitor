@@ -1,0 +1,16 @@
+{
+  "name": "monitor-client",
+  "version": "1.0.0",
+  "description": "Generic monitor client with eBPF support for real-time data streaming",
+  "main": "monitor_client.js",
+  "scripts": {
+    "start": "node monitor_client.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^4.6.1",
+    "winston": "^3.8.2"
+  }
+}

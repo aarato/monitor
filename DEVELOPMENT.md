@@ -13,13 +13,13 @@ This is a real-time network monitoring application with three main components:
 
 ### Core Components
 
-1. **Frontend Static Server** (`source/frontend_static_server/`)
+1. **Frontend Static Server** (`source/frontend/`)
    - Vue.js 3 application with Vite build system
    - Real-time dashboard with Socket.IO client connection
    - Components: NavBar, PageMain, WindowChart, WindowText, WindowInput, ModalRooms, ModalLocation
    - Uses Bootstrap 5, FontAwesome, and Smoothie charts for visualization
 
-2. **Backend WebSocket Server** (`source/backend_websocket_server/`)
+2. **Backend WebSocket Server** (`source/backend/`)
    - Express.js server with Socket.IO for real-time communication
    - Room-based authentication system using SHA256 hashed passwords
    - GeoIP lookup integration using MaxMind GeoLite2
@@ -47,7 +47,7 @@ This is a real-time network monitoring application with three main components:
 
 ### Frontend Development
 ```bash
-cd source/frontend_static_server
+cd source/frontend
 npm run dev          # Start development server on port 4000
 npm run build        # Build for production
 npm run preview      # Preview production build
@@ -56,7 +56,7 @@ npm run lint         # ESLint with auto-fix
 
 ### Backend Development
 ```bash
-cd source/backend_websocket_server
+cd source/backend
 npm start            # Start backend server (default port 80)
 ```
 

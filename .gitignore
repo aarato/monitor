@@ -1,12 +1,13 @@
-#Temporary Blocks
-/monitor*
-.vscode*
-/cloud_setup/*.sh
-/cloud_setup/*
-/source*
+# Project structure - only commit essential directories
+/source/oldclients/
+/source/clients/old/
+/very_old/
 
-# Development files
+# Build artifacts and development files
+bundle-stats.html
+dist/
 CLAUDE.md
+.vscode*
 
 # Logs
 logs

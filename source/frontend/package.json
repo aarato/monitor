@@ -1,0 +1,33 @@
+{
+  "name": "vue3template",
+  "version": "1.0.2",
+  "private": true,
+  "scripts": {
+    "dev": "vite --port 4000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.6",
+    "axios": "^1.2.1",
+    "bootstrap": "^5.2.3",
+    "bootstrap-icons": "^1.10.2",
+    "pinia": "^3.0.3",
+    "smoothie": "^1.36.1",
+    "socket.io": "^4.5.4",
+    "socket.io-client": "^4.5.4",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.1.4",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/eslint-config-prettier": "^7.1.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.3.0",
+    "prettier": "^2.8.8",
+    "rollup-plugin-visualizer": "^6.0.3",
+    "sass": "^1.57.1",
+    "vite": "^7.1.2"
+  }
+}
