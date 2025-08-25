@@ -25,8 +25,8 @@ module.exports = async function (ipaddr,source) {
             city: city,
             country: country,
             gps: gps,
-            as_number, as_number,
-            as_org, as_org
+            as_number: as_number,
+            as_org: as_org
         }
         log_output = `${source} - ${ipaddr},${country},${city},${gps},${timezone},${as_number},${as_org}`
         log.info(log_output)    

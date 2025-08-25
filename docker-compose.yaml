@@ -19,6 +19,9 @@ services:
     environment:
       - PORT=80
       - PASSWORD=Test123
+      - MAXMIND_ACCOUNT_ID=${MAXMIND_ACCOUNT_ID}
+      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
+      - GEOLITE2_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.monitor_backend.rule=PathPrefix(`/socket.io`)"

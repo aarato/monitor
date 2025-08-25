@@ -27,6 +27,10 @@ process.on('SIGTERM', function() {
   process.exit(0);
 });
 
+if ( ! process.env.PORT ) {
+  log.warn("No PORT environment variable set - using default port 80!")
+}
+
 if ( ! password ) {
   log.warn("No PASSWORD environment variable set - socket is open for all connections!")
 } else {
@@ -180,6 +184,15 @@ io.on('connection', socket => {
   socket.on("get_serverip", async (data, callback) => {
     callback(myip);
   });  
+
+  socket.on("get_location", async (ipaddr, callback) => {
+    try {
+      const geo = await geolookup(ipaddr, "get_location");
+      callback(geo);
+    } catch (error) {
+      callback({ error: error.message });
+    }
+  });
 
   socket.on("ping", (callback) => {
     log.debug("pong",new Date())

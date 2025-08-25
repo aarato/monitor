@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 export const useMonitorStore = defineStore("monitor", {
   state: () => ({
     textarea: "",
+    filterRegex: "",
     connected: false,
     loggedIn: false,
     pause: false,
@@ -24,6 +25,25 @@ export const useMonitorStore = defineStore("monitor", {
       interval: null, // setInterval variable
     },
   }),
+
+  getters: {
+    filteredTextarea: (state) => {
+      if (!state.filterRegex.trim()) {
+        return state.textarea;
+      }
+      
+      try {
+        const regex = new RegExp(state.filterRegex, 'i');
+        return state.textarea
+          .split('\n')
+          .filter(line => regex.test(line))
+          .join('\n');
+      } catch (e) {
+        // Invalid regex, return all content
+        return state.textarea;
+      }
+    },
+  },
 
   actions: {
     setConnected(status) {
@@ -79,6 +99,10 @@ export const useMonitorStore = defineStore("monitor", {
 
     setChartConfig(config) {
       this.chart.config = { ...this.chart.config, ...config };
+    },
+
+    setFilterRegex(regex) {
+      this.filterRegex = regex;
     },
   },
 });

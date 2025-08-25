@@ -38,6 +38,13 @@ function getServerIp() {
   });
 }
 
+function openMap(coordinates) {
+  if (coordinates && coordinates !== '0,0') {
+    const url = `https://www.google.com/maps/place/${coordinates}`;
+    window.open(url, '_blank');
+  }
+}
+
 onMounted(async () => {
   logger.component(`Mounted: ModalLocation`);
   state.clients = await getClients();
@@ -79,6 +86,7 @@ onMounted(async () => {
                     <th scope="col">Client IP</th>
                     <th scope="col">City</th>
                     <th scope="col">Country</th>
+                    <th scope="col">Location</th>
                     <th scope="col">AS#</th>
                     <th scope="col">AS Organization</th>
                     <th scope="col">Connection Time</th>
@@ -89,6 +97,17 @@ onMounted(async () => {
                     <th scope="row">{{ client.ipaddr }}</th>
                     <td>{{ client.city }}</td>
                     <td>{{ client.country }}</td>
+                    <td>
+                      <button 
+                        v-if="client.gps && client.gps !== '0,0'"
+                        class="btn btn-sm btn-outline-secondary"
+                        @click="openMap(client.gps)"
+                        title="View on Google Maps"
+                      >
+                        <i class="bi bi-geo-alt text-muted"></i>
+                      </button>
+                      <span v-else class="text-muted">-</span>
+                    </td>
                     <td>{{ client.as_number }}</td>
                     <td>{{ client.as_org }}</td>
                     <td>{{ client.since }}</td>

@@ -31,6 +31,12 @@ function location() {
   modal.show();
 }
 
+function ipLookup() {
+  let elem = document.getElementById("modalIpLookup");
+  let modal = new Modal(elem);
+  modal.show();
+}
+
 onMounted(() => {
   logger.component(`Mounted: NavBar`);
 });
@@ -39,10 +45,11 @@ onMounted(() => {
 <template>
   <nav
     id="Navbar"
-    class="ps-1 pe-1 navbar sticky-top navbar-expand navbar-dark bg-dark justify-content-between"
+    class="ps-1 pe-1 navbar sticky-top navbar-expand navbar-dark bg-dark"
   >
     <div class="btn-group">
-      <ButtonIcon icon="globe" text="Location" @click="location" />
+      <ButtonIcon icon="ethernet" text="Connected Clients" @click="location" />
+      <ButtonIcon icon="search" text="IP Lookup" @click="ipLookup" />
       <ButtonIcon
         v-if="!store.pause"
         icon="pause-circle"
@@ -69,10 +76,27 @@ onMounted(() => {
         text="Not connected to server"
       />
     </div>
+    
+    <div class="mx-auto d-flex align-items-center">
+      <input
+        type="text"
+        class="form-control form-control-sm text-light bg-dark border-secondary"
+        style="width: 200px; --bs-border-opacity: .5;"
+        placeholder="Filter (regex)"
+        v-model="store.filterRegex"
+        title="Filter lines using regular expressions"
+      />
+    </div>
+    
     <div class="btn-group">
       <ButtonIcon icon="gear" text="Settings" @click="rooms" />
     </div>
   </nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+.form-control::placeholder {
+  color: #adb5bd !important;
+  opacity: 1;
+}
+</style>

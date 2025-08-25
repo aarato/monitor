@@ -17,8 +17,9 @@ onMounted(() => {
 
   textUpdateInterval = setInterval(() => {
     // Only update 100ms period
-    if (state.text != store.textarea && !store.pause) {
-      state.text = store.textarea;
+    const filteredText = store.filteredTextarea;
+    if (state.text != filteredText && !store.pause) {
+      state.text = filteredText;
       taElement.scrollTop = taElement.scrollHeight; //scroll to bottom
     }
   }, 100);
