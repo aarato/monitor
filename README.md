@@ -16,15 +16,18 @@ Data Source → Monitor Client → Backend Server → Web Dashboard
 ```
 
 **Key Features:**
-- ✅ **Universal Input**: Accept data from any source via stdin
-- ✅ **Real-time Streaming**: Instant data delivery to web browsers
-- ✅ **Multiple Data Sources**: Support for text, JSON, and structured data
-- ✅ **Room Management**: Organize data streams by client/purpose
-- ✅ **Rate Limiting**: Built-in protection against data floods
-- ✅ **Authentication**: Secure client connections with password protection
-- ✅ **Geographic Info**: IP geolocation for connected clients
-- ✅ **Interactive Charts**: Live data visualization
-- ✅ **Responsive Design**: Works on desktop and mobile
+- **Universal Input**: Accept data from any source via stdin
+- **Real-time Streaming**: Instant data delivery to web browsers  
+- **Multiple Data Sources**: Support for text, JSON, and structured data
+- **Room Management**: Organize data streams by client/purpose
+- **Rate Limiting**: Built-in protection against data floods
+- **Authentication**: Secure client connections with password protection
+- **Geographic Info**: IP geolocation for connected clients
+- **Interactive Charts**: Live data visualization
+- **Responsive Design**: Works on desktop and mobile
+- **IP Lookup**: Built-in IP geolocation lookup tool
+- **Real-time Filtering**: Regex-based filtering of log streams
+- **Docker Support**: Containerized deployment with automated builds
 
 ## Components
 
@@ -169,55 +172,67 @@ echo '{"message":"Database query completed","duration_ms":150,"status":"success"
 
 ## Docker Deployment
 
-### Using Docker Compose
+### Quick Start with Docker Compose
 
-Create `docker-compose.yml`:
-```yaml
-version: '3.8'
-services:
-  backend:
-    build: ./source/backend
-    ports:
-      - "5000:80"
-    environment:
-      - PASSWORD=production_secret123
-      - GEOLITE2_LICENSE_KEY=your_maxmind_key
-    
-  frontend:
-    build: ./source/frontend
-    ports:
-      - "4000:80"
-    depends_on:
-      - backend
-```
+The system includes a ready-to-use docker-compose configuration:
 
-**Deploy:**
 ```bash
+# Start all services
 docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Access the dashboard
+# Frontend: http://localhost (port 80)
+# Backend API: http://localhost (routed by Traefik)
 ```
 
-### Individual Docker Builds
+### Building Images
 
-**Backend:**
+**Build scripts are provided for easy development:**
+
 ```bash
-cd source/backend
-docker build -t monitor-backend .
-docker run -d -p 5000:80 -e PASSWORD=secret123 monitor-backend
+# Build backend (requires MaxMind credentials)
+MAXMIND_ACCOUNT_ID=your_id MAXMIND_LICENSE_KEY=your_key ./build_backend.sh
+
+# Build frontend
+./build_frontend.sh
+
+# Or use docker-compose to build both
+docker-compose build
 ```
 
-**Frontend:**
+### Environment Setup
+
+**Required environment variables:**
+
 ```bash
-cd source/frontend
-docker build -t monitor-frontend .
-docker run -d -p 4000:80 monitor-frontend
+# For building backend with MaxMind geolocation
+export MAXMIND_ACCOUNT_ID=your_account_id
+export MAXMIND_LICENSE_KEY=your_license_key
+
+# For runtime
+export MAXMIND_ACCOUNT_ID=your_account_id
+export MAXMIND_LICENSE_KEY=your_license_key
 ```
 
-**Client (from any server):**
+### Production Deployment
+
 ```bash
-echo "Docker container started" | \
-  URL=http://your-backend-server:5000 \
-  PASSWORD=secret123 \
-  CLIENTNAME="DockerHost" \
+# Production deployment
+docker-compose -f docker-compose.yaml up -d
+
+# Scale if needed  
+docker-compose up -d --scale monitor_backend=2
+```
+
+**Client Connection:**
+```bash
+echo "Production alert" | \
+  URL=http://your-server \
+  PASSWORD=Test123 \
+  CLIENTNAME="ProductionServer" \
   node monitor_client.js
 ```
 
