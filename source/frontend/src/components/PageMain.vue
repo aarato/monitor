@@ -27,12 +27,10 @@ const handleConnectError = (error) => {
 
 const handleData = (data) => {
   let message;
-  let clientName = "";
   
   // Check if data is an object with client info
   if (typeof data === "object" && data.message && data.client) {
     message = data.message;
-    clientName = `[${data.client}] `;
   } else {
     // Handle legacy string data
     message = typeof data === "string" ? data : JSON.stringify(data);
@@ -47,7 +45,7 @@ const handleData = (data) => {
     second: '2-digit' 
   });
   
-  store.appendTextarea(`[${timeString}] ${clientName}${message}\n`);
+  store.appendTextarea(`[${timeString}] ${message}\n`);
   
   if (store.chart.series && !isNaN(message)) {
     store.chart.series.append(Date.now(), +message);
