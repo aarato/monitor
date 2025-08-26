@@ -56,6 +56,19 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

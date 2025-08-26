@@ -7,12 +7,12 @@ A complete real-time monitoring solution that streams data from any source to we
 The monitoring system creates a real-time data pipeline:
 
 ```
-Data Source → Monitor Client → Backend Server → Web Dashboard
-     ↓              ↓              ↓              ↓
-  Any program    Node.js       Socket.IO      Vue.js web app
-  that outputs   stdin reader   server with    with real-time
-  text/JSON      with rate      authentication charts and
-                 limiting       and rooms      room management
+Data Source —→ Monitor Client —————————→ Backend Server —→ Web Dashboard
+     ↓                ↓                       ↓                  ↓
+  Any program     Node.js                Socket.IO         Vue.js web app
+  that outputs    stdin reader           server with       with real-time
+  text/JSON       with rate              authentication    charts and
+                  limiting               and rooms         room management
 ```
 
 **Key Features:**
