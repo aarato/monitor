@@ -70,38 +70,36 @@ A Vue.js web application that displays real-time data streams in an interactive 
 
 ## Quick Start Example
 
-Here's a complete example showing all three components working together:
+Here's a complete example showing all components working together with Docker:
 
-### Step 1: Start Backend Server
+### Step 1: Set Environment Variables
+
+**Required for MaxMind geolocation (get free account at https://www.maxmind.com/en/geolite2/signup):**
+```bash
+export MAXMIND_ACCOUNT_ID=your_account_id
+export MAXMIND_LICENSE_KEY=your_license_key
+```
+
+### Step 2: Start Server Components with Docker
 
 ```bash
-cd source/backend
-npm install
-PORT=5000 PASSWORD=secret123 npm start
+# Start backend and frontend services
+docker-compose up -d
+
+# View logs to confirm startup
+docker-compose logs -f
 ```
 
 Expected output:
 ```
-2025-08-18 10:15:00.123 - info: Authentication enabled with password protection
-2025-08-18 10:15:00.125 - info: Monitor server started on port 5000 (custom)
-2025-08-18 10:15:00.130 - info: Server IP address: 192.168.1.100
+monitor_backend  | 2025-08-25 14:30:25.123 - info: Authentication enabled with password protection
+monitor_backend  | 2025-08-25 14:30:25.125 - info: Monitor server started on port 80 (default)
+monitor_backend  | 2025-08-25 14:30:25.130 - info: Server IP address: 64.53.161.244
+monitor_frontend | 2025/08/25 14:30:25 [notice] 1#1: nginx/1.28.0
+traefik          | time="2025-08-25T14:30:25Z" level=info msg="Starting provider *docker.Provider"
 ```
 
-### Step 2: Start Frontend Dashboard
-
-```bash
-cd source/frontend
-npm install
-npm run dev
-```
-
-Expected output:
-```
-Local:   http://localhost:4000/
-Network: use --host to expose
-```
-
-### Step 3: Send Data from Monitor Client
+### Step 3: Install and Send Data from Monitor Client
 
 ```bash
 cd source/clients
@@ -109,18 +107,24 @@ npm install
 
 # Send a simple message
 echo "Server status: All systems operational" | \
-  URL=http://localhost:5000 \
-  PASSWORD=secret123 \
+  URL=http://localhost \
+  PASSWORD=Test123 \
   CLIENTNAME="ServerMonitor" \
   node monitor_client.js
 ```
 
+**Client Environment Variables:**
+- `URL` - Backend server URL (default: http://localhost)
+- `PASSWORD` - Authentication password (default from docker-compose: Test123)
+- `CLIENTNAME` - Unique client identifier (default: Monitor)
+- `MAX_MESSAGES_PER_SECOND` - Rate limit (default: 10)
+
 ### Step 4: View in Web Browser
 
-1. Open http://localhost:4000
-2. Click "Rooms" button in navigation
+1. Open http://localhost (Traefik routes frontend and backend)
+2. Click "Settings" (gear icon) in navigation to manage rooms
 3. Join the "ServerMonitor" room
-4. You'll see the message appear in real-time: "Server status: All systems operational"
+4. You'll see the message appear in real-time: `[14:30:25] Server status: All systems operational`
 
 ## Advanced Examples
 
@@ -131,15 +135,15 @@ echo "Server status: All systems operational" | \
 while true; do
   echo "CPU: $(shuf -i 20-90 -n 1)% | Memory: $(shuf -i 40-95 -n 1)% | Load: $(shuf -i 1-8 -n 1).$(shuf -i 0-9 -n 1)"
   sleep 3
-done | CLIENTNAME="ServerMonitor" URL=http://localhost:5000 PASSWORD=secret123 node monitor_client.js
+done | CLIENTNAME="ServerMonitor" URL=http://localhost PASSWORD=Test123 node monitor_client.js
 ```
 
 **Terminal 2 - Application Logs:**
 ```bash
 tail -f /var/log/myapp.log | \
   CLIENTNAME="AppLogs" \
-  URL=http://localhost:5000 \
-  PASSWORD=secret123 \
+  URL=http://localhost \
+  PASSWORD=Test123 \
   node monitor_client.js
 ```
 
@@ -148,7 +152,7 @@ tail -f /var/log/myapp.log | \
 while true; do
   ping -c 1 8.8.8.8 | grep "time=" | awk '{print "Ping to 8.8.8.8: " $7}'
   sleep 2
-done | CLIENTNAME="NetworkMonitor" URL=http://localhost:5000 PASSWORD=secret123 node monitor_client.js
+done | CLIENTNAME="NetworkMonitor" URL=http://localhost PASSWORD=Test123 node monitor_client.js
 ```
 
 **Web Dashboard:**
@@ -162,8 +166,8 @@ done | CLIENTNAME="NetworkMonitor" URL=http://localhost:5000 PASSWORD=secret123 
 # Database monitoring with structured data
 echo '{"message":"Database query completed","duration_ms":150,"status":"success","rows_affected":42}' | \
   CLIENTNAME="Database" \
-  URL=http://localhost:5000 \
-  PASSWORD=secret123 \
+  URL=http://localhost \
+  PASSWORD=Test123 \
   node monitor_client.js
 ```
 
