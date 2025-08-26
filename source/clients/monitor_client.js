@@ -42,24 +42,24 @@ class GenericMonitorClient {
                 setTimeout(() => {
                     console.log(`✅ Socket.IO ready (room joined), ready to process stdin`);
                     resolve();
-                }, 1000); // Wait 1 second for room join
+                }, 2000); // Increased to 2 seconds for room join
                 return;
             }
 
             const timeout = setTimeout(() => {
                 console.log(`⚠️  Socket.IO connection timeout, proceeding anyway...`);
                 resolve();
-            }, 10000); // 10 second timeout (increased to allow for room join)
+            }, 15000); // 15 second timeout
 
             if (this.socketClient) {
                 this.socketClient.on('connect', () => {
                     clearTimeout(timeout);
                     console.log(`✅ Socket.IO connected, waiting for room join...`);
-                    // Wait a moment for server-side room join to complete
+                    // Wait longer for server-side room join to complete
                     setTimeout(() => {
                         console.log(`✅ Room join completed, ready to process stdin`);
                         resolve();
-                    }, 1000); // Wait 1 second for room join
+                    }, 2000); // Increased to 2 seconds for room join
                 });
 
                 this.socketClient.on('connect_error', (err) => {
