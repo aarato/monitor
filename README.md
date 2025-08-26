@@ -167,7 +167,11 @@ echo '{"message":"Database query completed","duration_ms":150,"status":"success"
   node monitor_client.js
 ```
 
-**Result:** Formatted as "Database query completed" in the web interface
+**Web Dashboard Display:**
+```
+[14:30:25] Database query completed
+```
+*Timestamp shows as HH:MM:SS format for cleaner log display*
 
 
 ## Docker Deployment
@@ -236,30 +240,30 @@ echo "Production alert" | \
   node monitor_client.js
 ```
 
-## Production Deployment
+## Web Interface Features
 
-### Backend (Production)
-```bash
-cd source/backend
-PORT=80 PASSWORD=production_secret123 GEOLITE2_LICENSE_KEY=your_key npm start
-```
+### Connected Clients Dashboard
+- View all connected clients with real-time geolocation
+- See IP addresses, cities, countries, and ISP information  
+- Interactive map links for client locations
+- Connection timestamps and AS number details
 
-### Frontend (Production)
-```bash
-cd source/frontend
-npm run build
-# Deploy dist/ folder to web server (nginx, Apache, etc.)
-```
+### IP Lookup Tool
+- Built-in IP geolocation lookup with validation
+- Search any IPv4 address for location details
+- Interactive map integration via Google Maps
+- Real-time results with city, country, coordinates
 
-### Client Configuration
-```bash
-# Production client example
-echo "Production system alert" | \
-  URL=https://monitor.yourcompany.com \
-  PASSWORD=production_secret123 \
-  CLIENTNAME="ProductionServer01" \
-  node monitor_client.js
-```
+### Real-time Log Filtering  
+- Regex-based filtering of incoming data streams
+- Live filtering as you type
+- Case-insensitive pattern matching
+- Show all data when filter is empty
+
+### Room Management
+- Join/leave different data source rooms
+- Organize multiple data streams
+- Real-time subscription management
 
 ## Use Cases
 
