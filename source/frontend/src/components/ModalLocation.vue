@@ -135,7 +135,7 @@ onMounted(async () => {
               class="form-control input-sm"
               readonly
               id="floatingIP"
-              :value="store.serverip"
+              :value="store.serverIp"
             />
             <label for="floatingIP">Server IP</label>
           </div>
