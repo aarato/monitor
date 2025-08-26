@@ -26,12 +26,31 @@ const handleConnectError = (error) => {
 };
 
 const handleData = (data) => {
-  if (typeof data != "string") {
-    data = JSON.stringify(data);
+  let message;
+  let clientName = "";
+  
+  // Check if data is an object with client info
+  if (typeof data === "object" && data.message && data.client) {
+    message = data.message;
+    clientName = `[${data.client}] `;
+  } else {
+    // Handle legacy string data
+    message = typeof data === "string" ? data : JSON.stringify(data);
   }
-  store.appendTextarea(`[${new Date().toLocaleString()}] ${data}\n`);
-  if (store.chart.series && !isNaN(data)) {
-    store.chart.series.append(Date.now(), +data);
+  
+  // Format timestamp as HH:MM:SS
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('en-US', { 
+    hour12: false, 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+  });
+  
+  store.appendTextarea(`[${timeString}] ${clientName}${message}\n`);
+  
+  if (store.chart.series && !isNaN(message)) {
+    store.chart.series.append(Date.now(), +message);
   }
 };
 

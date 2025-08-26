@@ -120,7 +120,11 @@ io.on('connection', socket => {
   
   socket.on("data", (data) => {
     if ( socket.user){
-      io.to(socket.user.username).emit("data" , data );
+      const dataWithClient = {
+        message: data,
+        client: socket.user.username
+      };
+      io.to(socket.user.username).emit("data" , dataWithClient );
     }
   });  
 
